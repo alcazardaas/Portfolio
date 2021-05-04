@@ -2,16 +2,21 @@
 import React, { useState } from 'react';
 import { useHistory } from "react-router-dom";
 
-const SignInForm = props => {
+const SignInForm = ({ users }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [errorMesage, setErrorMesage] = useState('')
     const history = useHistory();
 
     const handleSubmit = e => {
         e.preventDefault();
-        console.log(username, password)
-        localStorage.setItem('session', true)
-        history.push("/schedules");
+        if (users.find(u => u.username === username && u.password === password)) {
+            localStorage.setItem('session', users.find(u => u.username === username).id)
+            history.push("/schedules");
+        } else {
+            setErrorMesage('Username or password wrong. Please try again')
+            setTimeout(() => setErrorMesage(''), 5000)
+        }
     }
 
     return (
@@ -32,6 +37,8 @@ const SignInForm = props => {
                 value={password}
                 onChange={e => setPassword(e.target.value)}
             />
+
+            {errorMesage && <p className='error-mesage'>{errorMesage}</p>}
 
             <input className="button-primary" onClick={handleSubmit}
                 type="submit" value="Sign In"></input>
